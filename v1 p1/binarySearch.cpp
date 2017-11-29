@@ -6,7 +6,7 @@ using namespace std;
 ifstream in("data.in");
 ofstream out("data.out");
 
-void indexBinarySearch(vector <int> &seq, int &n)
+int indexBinarySearch(vector <int> &seq, int &n)
 {
     int index = n/2, ok = 0;
     while (!ok)
@@ -18,6 +18,13 @@ void indexBinarySearch(vector <int> &seq, int &n)
         }
         else if (seq[index] < index)
             index = (index + n) / 2;
+        else if (seq[index] > index)
+            index = index / 2;
+        if ((index < 0) || (index >= n))
+        {
+             return -1;
+             ok++;
+        }
     }
 }
 
@@ -28,6 +35,13 @@ int main()
     vector <int> seq(n);
     for (int i = 0; i < n; i++)
         in >> seq[i];
-    out << indexBinarySearch(seq, n);
+    int ret;
+    ret = indexBinarySearch(seq, n);
+    
+    if (ret != -1)
+        out << "Index: " << ret;
+    else
+        out << "Not found.";
+
     return 0;
 }

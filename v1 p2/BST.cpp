@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <fstream>
 #include <vector>
+#include <queue>
 using namespace std;
 
 ifstream in("data.in");
@@ -16,12 +17,16 @@ private:
 public:
     node();
     static void addNode(node*&, int);
+    static void addNodeSupport(queue);
+
     void inorderPrint();
     void preorderPrint();
     void postorderPrint();
+    
     int inorderRet();
     int preorderRet();
     int postorderRet();
+    
     int getvalue() {return value;}
 };
 
@@ -38,6 +43,41 @@ node::node()
 
 void node::addNode(node*& root, int val)
 {
+    queue <node*> roots;
+    roots.push(root);
+    addNodeSupport(roots, val)
+}
+
+void node::addNodeSupport(queue <node*> roots, int val)
+{
+    int stop = 0; 
+    while (!stop)
+    {
+        if (root == NULL)
+        {
+            out << "\n Added " << val << " to the binary tree.";
+            root = new node;
+            root -> value = val;
+            root -> descendents++;
+            stop = 1;
+        }
+        else if (root -> descendents == 0)
+        {
+            addNode(root -> left, val);
+            root -> descendents++;
+        }
+        else if (root -> descendents == 1)
+        {
+            addNode(root -> right, val);
+            root -> descendents++;
+        }
+        else if (root -> descendents == 2)
+        {
+            leaf.push(root -> left);
+            leaf.push(root -> right);
+        }
+    }
+
     if (root == NULL)
     {
         out << "\n Added " << val << " to the binary tree.";
