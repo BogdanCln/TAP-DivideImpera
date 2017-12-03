@@ -1,1 +1,11 @@
-11
+
+Vectori curenti:
+1 5 6 9  (4) - 	5
+2 3 7 10 14 18 19  (7) - 	10
+Vectori curenti:
+5 6 9  (3) - 	6
+2 3 7 10  (4) - 	3
+Vectori curenti:
+5 6  (2) - 	5
+3 7 10  (3) - 	7
+Mediana: 7

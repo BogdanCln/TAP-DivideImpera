@@ -12,12 +12,15 @@ struct node
 {
 private:
     node *left, *right;
-    int value, descendents;
+    int value;
+    int initialized;
 
 public:
+    
+    static queue <node*> addOrder;
+    static node* BTroot;
     node();
-    static void addNode(node*&, int);
-    static void addNodeSupport(queue);
+    static void addNode(int);
 
     void inorderPrint();
     void preorderPrint();
@@ -30,7 +33,8 @@ public:
     int getvalue() {return value;}
 };
 
-node *BTroot = NULL;
+queue <node*> node::addOrder;
+node* node::BTroot = NULL;
 vector <int> inorder, postorder;
 int n;
 
@@ -38,75 +42,34 @@ node::node()
 {
     left = NULL;
     right = NULL;
-    descendents = -1;
+    initialized = 0;
 }
 
-void node::addNode(node*& root, int val)
+void node::addNode(int val)
 {
-    queue <node*> roots;
-    roots.push(root);
-    addNodeSupport(roots, val)
-}
-
-void node::addNodeSupport(queue <node*> roots, int val)
-{
-    int stop = 0; 
-    while (!stop)
+    node* root;
+    if (BTroot == NULL)
     {
-        if (root == NULL)
-        {
-            out << "\n Added " << val << " to the binary tree.";
-            root = new node;
-            root -> value = val;
-            root -> descendents++;
-            stop = 1;
-        }
-        else if (root -> descendents == 0)
-        {
-            addNode(root -> left, val);
-            root -> descendents++;
-        }
-        else if (root -> descendents == 1)
-        {
-            addNode(root -> right, val);
-            root -> descendents++;
-        }
-        else if (root -> descendents == 2)
-        {
-            leaf.push(root -> left);
-            leaf.push(root -> right);
-        }
+        BTroot = new node;
+        root = BTroot;
     }
-
-    if (root == NULL)
+    else
     {
-        out << "\n Added " << val << " to the binary tree.";
-        root = new node;
-        root -> value = val;
-        root -> descendents++;
+        root = addOrder.front();
+        node::addOrder.pop();
     }
-    else if (root -> descendents == 0)
-    {
-        addNode(root -> left, val);
-        root -> descendents++;
-    }
-    else if (root -> descendents == 1)
-    {
-        addNode(root -> right, val);
-        root -> descendents++;
-    }
-    else if (root -> descendents == 2)
-    {
-        if ((root -> left == NULL) || (root -> left -> descendents < 2))
-            addNode(root -> left, val);
-        else if ((root -> right == NULL) || (root -> right -> descendents < 2))
-            addNode(root -> right, val);
-    }
+    root -> value = val;
+    root -> initialized ++;
+    root -> left = new node;
+    root -> right = new node;
+    out << "\n Added " << val << " on address " << root << " - his childs are " << root -> left << ", " << root -> right;
+    node::addOrder.push(root->left);
+    node::addOrder.push(root->right);
 }
 
 void node::inorderPrint()
 {
-    if (this != NULL)
+    if ((this != NULL) && (initialized))
     {
         (this -> left) -> inorderPrint();
         out << this -> value << " ";
@@ -115,7 +78,7 @@ void node::inorderPrint()
 }
 void node::preorderPrint()
 {
-    if (this != NULL)
+    if ((this != NULL) && (initialized))
     {
         out << this -> value << " ";
         (this -> left) -> preorderPrint();
@@ -124,7 +87,7 @@ void node::preorderPrint()
 }
 void node::postorderPrint()
 {
-    if (this != NULL)
+    if ((this != NULL) && (initialized))
     {
         (this -> left) -> postorderPrint();
         (this -> right) -> postorderPrint();
@@ -133,7 +96,7 @@ void node::postorderPrint()
 }
 int node::inorderRet()
 {
-    if (this != NULL)
+    if ((this != NULL) && (initialized))
     {
         (this -> left) -> inorderPrint();
         return this -> value;
@@ -142,7 +105,7 @@ int node::inorderRet()
 }
 int node::preorderRet()
 {
-    if (this != NULL)
+    if ((this != NULL) && (initialized))
     {
         return this -> value;
         (this -> left) -> preorderPrint();
@@ -151,7 +114,7 @@ int node::preorderRet()
 }
 int node::postorderRet()
 {
-    if (this != NULL)
+    if ((this != NULL) && (initialized))
     {
         (this -> left) -> postorderPrint();
         (this -> right) -> postorderPrint();
@@ -232,10 +195,10 @@ void pushBinaryTree(vector <int> inord, vector <int> postord)
     
     //add left child
     if(LHS.size() > 0)
-    node::addNode(BTroot, LHSpost.back());
+    node::addNode(LHSpost.back());
     //add right child
     if(RHS.size() > 0)
-    node::addNode(BTroot, RHSpost.back());
+    node::addNode(RHSpost.back());
     
     if(LHS.size() > 0)
     pushBinaryTree(LHS, LHSpost);
@@ -247,8 +210,8 @@ void pushBinaryTree(vector <int> inord, vector <int> postord)
 int checkValid(vector <int> &inorder, vector<int> &postorder)
 {
     vector <int> newInorder, newPostorder;
-    newInorder.push_back(BTroot -> inorderRet());
-    newPostorder.push_back(BTroot -> postorderRet());
+    newInorder.push_back(node::BTroot -> inorderRet());
+    newPostorder.push_back(node::BTroot -> postorderRet());
     if ((inorder.size() == newInorder.size()) && (postorder.size() == newPostorder.size()))
     {
         int ok = 1;
@@ -274,18 +237,18 @@ int main()
     readPostorder();
     
     //add the root
-    node::addNode(BTroot, postorder.back());
+    node::addNode(postorder.back());
 
     pushBinaryTree(inorder, postorder);
 
     vector <int> finalIn, finalPost;
     
     out << "\nPreorder:\t";
-    BTroot -> preorderPrint();
+    node::BTroot -> preorderPrint();
     out << "\nInorder:\t";
-    BTroot -> inorderPrint();
+    node::BTroot -> inorderPrint();
     out << "\nPostorder:\t";
-    BTroot -> postorderPrint();
+    node::BTroot -> postorderPrint();
 /*
     if (checkValid(inorder, postorder))
         out << "\nValid input data.\t";
